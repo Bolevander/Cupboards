@@ -5,7 +5,8 @@
         #region ClassLifeCycles
 
         public MainControllers(GameContext context)
-        {           
+        {
+            Add(new LevelController());
         }
 
         #endregion
