@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using UnityEngine;
 
 
 namespace CupBoards
 {
     [Serializable]
-    public class LevelData
+    public sealed class LevelData
     {
+        #region Fields
+
         public Vector2[] pointsCoordinates;
         public (int, int)[] linksBetweenPoints;
 
@@ -19,6 +20,11 @@ namespace CupBoards
         private int _linksCount;
         private int _cupsCount;
         private int _pointsCount;
+
+        #endregion
+
+
+        #region Methods
 
         public static LevelData Deserialize(string filePath)
         {
@@ -82,6 +88,8 @@ namespace CupBoards
                 Debug.Log($"Invalid level data, error {e}");
                 return null;
             }
-        }
+        } 
+
+        #endregion
     }
 }

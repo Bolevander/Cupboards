@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace CupBoards
 {
-    public class NavigateController : IExecuteController, IInitializeController
+    public sealed class NavigateController : IExecuteController, IInitializeController
     {
+        #region Fields
+
         private const float _interpolationFramesCount = 30f;
 
         private bool IsMoving;
@@ -14,11 +17,20 @@ namespace CupBoards
         private GameContext _context;
         private List<PointBehaviour> _pointBehaviours = new List<PointBehaviour>();
 
+        #endregion
+
+
+        #region ClassLifeCycles
+
         public NavigateController(GameContext context)
         {
             _context = context;
-
         }
+
+        #endregion
+
+
+        #region IInitializeController
 
         public void Initialize()
         {
@@ -31,6 +43,11 @@ namespace CupBoards
                 }
             }
         }
+
+        #endregion
+
+
+        #region IExecuteController
 
         public void Execute()
         {
@@ -47,10 +64,10 @@ namespace CupBoards
             }
         }
 
-        private void FindAWay()
-        {
+        #endregion
 
-        }
+
+        #region Methods
 
         private void Click(PointBehaviour point)
         {
@@ -60,7 +77,7 @@ namespace CupBoards
                 {
                     if (_context.CurrentCup != null)
                     {
-                        _context.CurrentCup.ImageColor = _context.CurrentCup.NormalColor; 
+                        _context.CurrentCup.ImageColor = _context.CurrentCup.NormalColor;
                     }
 
                     _context.CurrentCup = point.placedCup;
@@ -78,7 +95,7 @@ namespace CupBoards
 
                         IsMoving = true;
                     }
-                } 
+                }
             }
         }
 
@@ -90,5 +107,7 @@ namespace CupBoards
 
             IsMoving = false;
         }
+
+        #endregion
     }
 }
