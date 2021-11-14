@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace CupBoards
@@ -7,7 +8,7 @@ namespace CupBoards
     {
         #region Fields
 
-        [SerializeField] private SpriteRenderer _sprite;
+        [SerializeField] private Image _image;
         [SerializeField] private Color _normalColor = new Color(0.5f, 0.5f, 1, 1);
         [SerializeField] private Color _dragColor = new Color(1, 0.5f, 0.5f, 1);
 
@@ -20,16 +21,16 @@ namespace CupBoards
         public Color DragColor => _dragColor;
         public Color ImageColor
         {
-            get => _sprite.color;
+            get => _image.color;
             set
             {
                 if (value == _normalColor || value == _dragColor)
                 {
-                    _sprite.color = value;
+                    _image.color = value;
                 }
                 else
                 {
-                    Debug.Log("Недопустимый цвет");
+                    Debug.Log("Invalid color");
                 }
             }
         }
@@ -41,9 +42,9 @@ namespace CupBoards
 
         protected virtual void OnValidate()
         {
-            if (_sprite == null)
+            if (_image == null)
             {
-                _sprite = GetComponent<SpriteRenderer>();
+                _image = GetComponent<Image>();
             }
             ImageColor = _normalColor;
         }

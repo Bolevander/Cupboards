@@ -1,10 +1,10 @@
 ﻿namespace CupBoards
 {
-    public sealed class MainFixedControllers : Controllers
+    public sealed class MainLateControllers : Controllers
     {
         #region ClassLifeCycles
 
-        public MainFixedControllers(GameContext context)
+        public MainLateControllers(GameContext context)
         {
             Add(new NavigateController(context));
         }
