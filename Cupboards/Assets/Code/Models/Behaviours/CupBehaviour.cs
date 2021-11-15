@@ -4,13 +4,14 @@ using UnityEngine.UI;
 
 namespace CupBoards
 {
+    [RequireComponent(typeof(Image))]
     public class CupBehaviour : MonoBehaviour
     {
         #region Fields
 
         [SerializeField] private Image _image;
-        [SerializeField] private Color _normalColor = new Color(0.5f, 0.5f, 1, 1);
-        [SerializeField] private Color _dragColor = new Color(1, 0.5f, 0.5f, 1);
+        [SerializeField] private Color _normalColor;
+        [SerializeField] private Color _dragColor = new Color(1, 1, 1, 1);
 
         #endregion
 
@@ -35,10 +36,20 @@ namespace CupBoards
             }
         }
 
+        public int Id { get; set; }
+
         #endregion
 
 
         #region UnityMethods
+
+        private void Awake()
+        {
+            Color temp = new Color(Random.Range(0f, 0.8f), Random.Range(0f, 0.8f), Random.Range(0f, 0.8f));
+            _normalColor = temp;
+            ImageColor = NormalColor;
+            Id = Random.Range(0, 10000);
+        }
 
         protected virtual void OnValidate()
         {
@@ -46,7 +57,7 @@ namespace CupBoards
             {
                 _image = GetComponent<Image>();
             }
-            ImageColor = _normalColor;
+            ImageColor = NormalColor;
         }
 
         #endregion

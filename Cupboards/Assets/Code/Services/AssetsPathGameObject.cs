@@ -11,12 +11,8 @@ namespace CupBoards
         {
             { GameObjectType.Cup, "Prefabs/Cup" },
             { GameObjectType.PathLine, "Prefabs/PathLine" },
-            { GameObjectType.Point, "Prefabs/Point" }
-        };
-
-        public static readonly Dictionary<ScreenType, string> Screens = new Dictionary<ScreenType, string>()
-        {
-            {ScreenType.LoadLevel, "Prefabs/UI/Screen/Prefabs_UI_Screen_GameOver"},//uncorrect
+            { GameObjectType.Point, "Prefabs/Point" },
+            { GameObjectType.LoadButton, "Prefabs/UI/LoadButton" }
         };
 
         #endregion
