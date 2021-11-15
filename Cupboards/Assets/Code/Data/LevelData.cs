@@ -11,6 +11,7 @@ namespace CupBoards
     {
         #region Fields
 
+        public Action OnMove = () => { };
         public Vector2[] pointsCoordinates;
         public (int, int)[] linksBetweenPoints;
 
@@ -50,7 +51,7 @@ namespace CupBoards
                 result.pointsCoordinates = new Vector2[result._pointsCount];
                 for (int i = 0; i < result._pointsCount; i++)
                 {
-                    fileLines[i].Trim(' ');
+                    fileLines[step].Trim(' ');
                     result.pointsCoordinates[i].x = Convert.ToInt32(fileLines[step].Split(',')[0]);
                     result.pointsCoordinates[i].y = Convert.ToInt32(fileLines[step++].Split(',')[1]);
                 }
@@ -76,7 +77,7 @@ namespace CupBoards
                 result.linksBetweenPoints = new (int, int)[result._linksCount];
                 for (int i = 0; i < result._linksCount; i++)
                 {
-                    fileLines[i].Trim(' ');
+                    fileLines[step].Trim(' ');
                     result.linksBetweenPoints[i].Item1 = Convert.ToInt32(fileLines[step].Split(',')[0]);
                     result.linksBetweenPoints[i].Item2 = Convert.ToInt32(fileLines[step++].Split(',')[1]);
                 }

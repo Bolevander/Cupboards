@@ -9,13 +9,17 @@ namespace CupBoards
         #region Fields
 
         private const float _interpolationFramesCount = 30f;
+        private readonly GameContext _context;
 
-        private bool IsMoving;
+        private bool _isMoving;
         private float _elapsedFrames;
         private Vector3 _endPointDirection;
         private Vector3 _startPointDirection;
-        private GameContext _context;
-        private List<PointBehaviour> _pointBehaviours = new List<PointBehaviour>();
+        private CupBehaviour _currentCup;
+        private PointBehaviour _previousPoint;
+        private PointBehaviour[] _shortestPath;
+        private int _pathIndex;
+        private List<PointBehaviour[]> _possiblePaths;
 
         #endregion
 
@@ -34,14 +38,7 @@ namespace CupBoards
 
         public void Initialize()
         {
-            _pointBehaviours.AddRange(Object.FindObjectsOfType<PointBehaviour>(true));
-            if (_pointBehaviours != null && _pointBehaviours.Count > 0)
-            {
-                foreach (var cup in _pointBehaviours)
-                {
-                    cup.OnPointerClickEvent += Click;
-                }
-            }
+            _context.LoadMenu.OnStart += SetOnClickEvent;
         }
 
         #endregion
@@ -51,16 +48,9 @@ namespace CupBoards
 
         public void Execute()
         {
-            if (IsMoving)
+            if (_isMoving == true)
             {
-                float interpolationRatio = _elapsedFrames / _interpolationFramesCount;
-                _context.CurrentCup.transform.position = Vector3.Lerp(_startPointDirection, _endPointDirection, interpolationRatio);
-                _elapsedFrames = (_elapsedFrames + 1) % (_interpolationFramesCount + 1);
-
-                if (_context.CurrentCup.transform.position == _endPointDirection)
-                {
-                    StopMoving();
-                }
+                MoveCup();
             }
         }
 
@@ -69,43 +59,166 @@ namespace CupBoards
 
         #region Methods
 
+        private void SetOnClickEvent()
+        {
+            if (_context.Points != null && _context.Points.Count > 0)
+            {
+                foreach (var cup in _context.Points)
+                {
+                    cup.OnPointerClickEvent += Click;
+                }
+            }
+        }
+
         private void Click(PointBehaviour point)
         {
-            if (IsMoving == false)
+            if (_isMoving == false)
             {
                 if (point.placedCup != null)
                 {
-                    if (_context.CurrentCup != null)
-                    {
-                        _context.CurrentCup.ImageColor = _context.CurrentCup.NormalColor;
-                    }
-
-                    _context.CurrentCup = point.placedCup;
-                    _context.PreviousPoint = point;
-                    _context.CurrentCup.ImageColor = _context.CurrentCup.DragColor;
+                    SelectCup(point);
                 }
                 else
                 {
-                    if (_context.CurrentCup != null)
-                    {
-                        _context.PreviousPoint.placedCup = null;
-                        point.placedCup = _context.CurrentCup;
-                        _startPointDirection = _context.CurrentCup.transform.position;
-                        _endPointDirection = point.transform.position;
+                    StartPath(point);
+                }
+            }
+        }
 
-                        IsMoving = true;
+        private void SelectCup(PointBehaviour point)
+        {
+            if (_currentCup != null)
+            {
+                _currentCup.ImageColor = _currentCup.NormalColor;
+            }
+            foreach (var element in _context.Points)
+            {
+                HighlightPoint(element, false);
+            }
+
+            _currentCup = point.placedCup;
+            _previousPoint = point;
+            _currentCup.ImageColor = _currentCup.DragColor;
+
+            CreatePaths(point);
+        }
+
+        private void StartPath(PointBehaviour point)
+        {
+            _possiblePaths = new List<PointBehaviour[]>();
+            CreatePaths(_previousPoint, point);
+            if (_possiblePaths.Count > 0)
+            {
+                foreach (var element in _context.Points)
+                {
+                    HighlightPoint(element, false);
+                }
+
+                var temp = _possiblePaths[0];
+                foreach (var path in _possiblePaths)
+                {
+                    if (path.Length < temp.Length)
+                    {
+                        temp = path;
+                    }
+                }
+                _shortestPath = temp;
+                SendCupToPoint(_shortestPath[_pathIndex]);
+            }
+        }
+
+        private void CreatePaths(PointBehaviour currentPoint, PointBehaviour endPoint = null,
+            LinkedList<PointBehaviour> pointsMap = null)
+        {
+            if (pointsMap == null)
+            {
+                pointsMap = new LinkedList<PointBehaviour>();
+            }
+
+            foreach (var point in currentPoint.AvailableTransitions)
+            {
+                if (point.placedCup == null)
+                {
+                    if (endPoint == null)
+                    {
+                        HighlightPoint(point, true);
+                    }
+
+                    while (pointsMap.Count > 0 && pointsMap.Last.Value.AvailableTransitions.Contains(point) == false)
+                    {
+                        pointsMap.RemoveLast();
+                    }
+
+                    if (point == endPoint)
+                    {
+                        pointsMap.AddLast(point);
+                        var temp = new PointBehaviour[pointsMap.Count];
+                        pointsMap.CopyTo(temp, 0);
+                        _possiblePaths.Add(temp);
+                        break;
+                    }
+                    else if (pointsMap.Contains(point) == false)
+                    {
+                        pointsMap.AddLast(point);
+                        CreatePaths(point, endPoint, pointsMap);
                     }
                 }
             }
         }
 
+        private void HighlightPoint(PointBehaviour point, bool flag)
+        {
+            if (flag)
+            {
+                point.ImageColor = point.HighlightColor;
+            }
+            else
+            {
+                point.ImageColor = point.NormalColor;
+            }
+        }
+
+        private void SendCupToPoint(PointBehaviour point)
+        {
+            if (_currentCup != null)
+            {
+                _previousPoint.placedCup = null;
+                _previousPoint = point;
+                point.placedCup = _currentCup;
+                _startPointDirection = _currentCup.transform.position;
+                _endPointDirection = point.transform.position;
+                _isMoving = true;
+            }
+        }
+
+        private void MoveCup()
+        {
+            float interpolationRatio = _elapsedFrames / _interpolationFramesCount;
+            _currentCup.transform.position = Vector3.Lerp(_startPointDirection, _endPointDirection, interpolationRatio);
+            _elapsedFrames = (_elapsedFrames + 1) % (_interpolationFramesCount + 1);
+
+            if (_currentCup.transform.position == _endPointDirection)
+            {
+                StopMoving();
+            }
+        }
+
         private void StopMoving()
         {
-            _elapsedFrames = 0f;
-            _context.CurrentCup.ImageColor = _context.CurrentCup.NormalColor;
-            _context.CurrentCup = null;
-
-            IsMoving = false;
+            _elapsedFrames = 0f;            
+            if (_pathIndex < _shortestPath.Length - 1)
+            {
+                _pathIndex++;
+                SendCupToPoint(_shortestPath[_pathIndex]);
+            }
+            else
+            {
+                _pathIndex = 0;
+                _currentCup.ImageColor = _currentCup.NormalColor;
+                _currentCup = null;
+                _isMoving = false;
+                _context.CurrentLevel.OnMove.Invoke();
+            }
         }
 
         #endregion

@@ -6,7 +6,8 @@
 
         public MainControllers(GameContext context)
         {
-            Add(new LevelController());
+            Add(new LevelController(context));
+            Add(new GameStageController(context));
         }
 
         #endregion

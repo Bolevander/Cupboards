@@ -1,8 +1,17 @@
-﻿namespace CupBoards
+﻿using System.Collections.Generic;
+
+
+namespace CupBoards
 {
     public sealed class GameContext : Contexts
     {
-        public CupBehaviour CurrentCup { get; set; }
-        public PointBehaviour PreviousPoint { get; set; }
+        #region Properties
+
+        public List<LevelData> Levels { get; set; }
+        public List<PointBehaviour> Points { get; set; }
+        public LevelData CurrentLevel { get; set; }
+        public LoadMenuBehaviour LoadMenu { get; set; }
+
+        #endregion
     }
 }
