@@ -11,6 +11,7 @@ namespace CupBoards
         public List<PointBehaviour> Points { get; set; }
         public LevelData CurrentLevel { get; set; }
         public LoadMenuBehaviour LoadMenu { get; set; }
+        public float CupSpeed { get; set; }
 
         #endregion
     }

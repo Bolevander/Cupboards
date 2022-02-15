@@ -7,8 +7,8 @@ namespace CupBoards
     {
         #region Fields
 
-        private readonly List<Controllers> _fixedUpdateFeatures;
         private readonly List<Controllers> _updateFeatures;
+        private readonly List<Controllers> _fixedUpdateFeatures;
         private readonly List<Controllers> _lateUpdateFeatures;
 
 #if UNITY_EDITOR
@@ -22,8 +22,8 @@ namespace CupBoards
 
         protected GameStateController(int capacity = 8)
         {
-            _fixedUpdateFeatures = new List<Controllers>(capacity);
             _updateFeatures = new List<Controllers>(capacity);
+            _fixedUpdateFeatures = new List<Controllers>(capacity);
             _lateUpdateFeatures = new List<Controllers>(capacity);
         }
 
@@ -34,23 +34,23 @@ namespace CupBoards
 
         public void Initialize()
         {
-            foreach (var feature in _fixedUpdateFeatures)
+            foreach (Controllers feature in _updateFeatures)
             {
                 feature.Initialize();
             }
 
-            foreach (var feature in _updateFeatures)
+            foreach (Controllers feature in _fixedUpdateFeatures)
             {
                 feature.Initialize();
             }
 
-            foreach (var feature in _lateUpdateFeatures)
+            foreach (Controllers feature in _lateUpdateFeatures)
             {
                 feature.Initialize();
             }
 
 #if UNITY_EDITOR
-            foreach (var feature in _onDrawGizmosFeatures)
+            foreach (Controllers feature in _onDrawGizmosFeatures)
             {
                 feature.Initialize();
             }
@@ -62,12 +62,12 @@ namespace CupBoards
             List<Controllers> features = null;
             switch (updateType)
             {
-                case UpdateType.Fixed:
-                    features = _fixedUpdateFeatures;
-                    break;
-
                 case UpdateType.Update:
                     features = _updateFeatures;
+                    break;
+
+                case UpdateType.Fixed:
+                    features = _fixedUpdateFeatures;
                     break;
 
                 case UpdateType.Late:
@@ -84,7 +84,7 @@ namespace CupBoards
                     break;
             }
 
-            foreach (var feature in features)
+            foreach (Controllers feature in features)
             {
                 feature.Execute();
             }
@@ -95,12 +95,12 @@ namespace CupBoards
             List<Controllers> features = null;
             switch (updateType)
             {
-                case UpdateType.Fixed:
-                    features = _fixedUpdateFeatures;
-                    break;
-
                 case UpdateType.Update:
                     features = _updateFeatures;
+                    break;
+
+                case UpdateType.Fixed:
+                    features = _fixedUpdateFeatures;
                     break;
 
                 case UpdateType.Late:
@@ -117,7 +117,7 @@ namespace CupBoards
                     break;
             }
 
-            foreach (var feature in features)
+            foreach (Controllers feature in features)
             {
                 feature.Cleanup();
             }
@@ -125,37 +125,37 @@ namespace CupBoards
 
         public void TearDown()
         {
-            foreach (var feature in _fixedUpdateFeatures)
+            foreach (Controllers feature in _updateFeatures)
             {
                 feature.TearDown();
             }
 
-            foreach (var feature in _updateFeatures)
+            foreach (Controllers feature in _fixedUpdateFeatures)
             {
                 feature.TearDown();
             }
 
-            foreach (var feature in _lateUpdateFeatures)
+            foreach (Controllers feature in _lateUpdateFeatures)
             {
                 feature.TearDown();
             }
 
 #if UNITY_EDITOR
-            foreach (var feature in _onDrawGizmosFeatures)
+            foreach (Controllers feature in _onDrawGizmosFeatures)
             {
                 feature.TearDown();
             }
 #endif
         }
+        protected void AddUpdateFeature(Controllers controller)
+        {
+            _updateFeatures.Add(controller);
+        }
+
 
         protected void AddFixedUpdateFeature(Controllers controller)
         {
             _fixedUpdateFeatures.Add(controller);
-        }
-
-        protected void AddUpdateFeature(Controllers controller)
-        {
-            _updateFeatures.Add(controller);
         }
 
         protected void AddLateUpdateFeature(Controllers controller)
