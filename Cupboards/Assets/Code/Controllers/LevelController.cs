@@ -42,6 +42,7 @@ namespace CupBoards
             _context.LoadMenu = Object.FindObjectOfType<LoadMenuBehaviour>(true);
             _buttonContainer = _context.LoadMenu.buttonsContainer;
             _levelContainer = Object.FindObjectOfType<LevelContainerBehaviour>();
+            _context.CupSpeed = _levelContainer.cupSpeed;
 
             var path = AssetsPathGameObject.Object[GameObjectType.Cup];
             _cup = Resources.Load<CupBehaviour>(path);

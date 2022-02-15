@@ -106,11 +106,7 @@ GameObject:
   - component: {fileID: 6195119243872960433}
   - component: {fileID: 6195119243872960428}
   - component: {fileID: 6195119243872960435}
-<<<<<<< Updated upstream
   - component: {fileID: 113886872}
-=======
-  - component: {fileID: 6195119243872960434}
->>>>>>> Stashed changes
   m_Layer: 0
   m_Name: LoadButton
   m_TagString: Untagged
@@ -190,11 +186,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6195119243872960432}
   m_CullTransparentMesh: 1
-<<<<<<< Updated upstream
 --- !u!95 &113886872
-=======
---- !u!95 &6195119243872960434
->>>>>>> Stashed changes
 Animator:
   serializedVersion: 3
   m_ObjectHideFlags: 0

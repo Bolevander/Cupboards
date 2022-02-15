@@ -8,11 +8,7 @@ namespace CupBoards
     {
         #region Fields
 
-<<<<<<< Updated upstream
         public Action OnStart = () => { };
-=======
-        public Action OnLoad = () => { };
->>>>>>> Stashed changes
         public GameObject buttonsContainer;
 
         #endregion

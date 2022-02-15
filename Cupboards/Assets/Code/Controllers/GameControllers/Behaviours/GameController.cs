@@ -27,16 +27,16 @@ namespace CupBoards
             Time.timeScale = 1;
         }
 
-        private void FixedUpdate()
-        {
-            _activeController.Execute(UpdateType.Fixed);
-            _activeController.Cleanup(UpdateType.Fixed);
-        }
-
         private void Update()
         {
             _activeController.Execute(UpdateType.Update);
             _activeController.Cleanup(UpdateType.Update);
+        }
+
+        private void FixedUpdate()
+        {
+            _activeController.Execute(UpdateType.Fixed);
+            _activeController.Cleanup(UpdateType.Fixed);
         }
 
         private void LateUpdate()

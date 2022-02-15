@@ -8,9 +8,9 @@ namespace CupBoards
     {
         #region Fields
 
-        private const float _interpolationFramesCount = 30f;
         private readonly GameContext _context;
 
+        private float _cupMovementTime;
         private bool _isMoving;
         private float _elapsedFrames;
         private Vector3 _endPointDirection;
@@ -39,6 +39,7 @@ namespace CupBoards
         public void Initialize()
         {
             _context.LoadMenu.OnStart += SetOnClickEvent;
+            _cupMovementTime = 1 / _context.CupSpeed;
         }
 
         #endregion
@@ -63,7 +64,7 @@ namespace CupBoards
         {
             if (_context.Points != null && _context.Points.Count > 0)
             {
-                foreach (var cup in _context.Points)
+                foreach (PointBehaviour cup in _context.Points)
                 {
                     cup.OnPointerClickEvent += Click;
                 }
@@ -91,7 +92,7 @@ namespace CupBoards
             {
                 _currentCup.ImageColor = _currentCup.NormalColor;
             }
-            foreach (var element in _context.Points)
+            foreach (PointBehaviour element in _context.Points)
             {
                 HighlightPoint(element, false);
             }
@@ -109,13 +110,13 @@ namespace CupBoards
             CreatePaths(_previousPoint, point);
             if (_possiblePaths.Count > 0)
             {
-                foreach (var element in _context.Points)
+                foreach (PointBehaviour element in _context.Points)
                 {
                     HighlightPoint(element, false);
                 }
 
-                var temp = _possiblePaths[0];
-                foreach (var path in _possiblePaths)
+                PointBehaviour[] temp = _possiblePaths[0];
+                foreach (PointBehaviour[] path in _possiblePaths)
                 {
                     if (path.Length < temp.Length)
                     {
@@ -135,7 +136,7 @@ namespace CupBoards
                 pointsMap = new LinkedList<PointBehaviour>();
             }
 
-            foreach (var point in currentPoint.AvailableTransitions)
+            foreach (PointBehaviour point in currentPoint.AvailableTransitions)
             {
                 if (point.placedCup == null)
                 {
@@ -152,7 +153,7 @@ namespace CupBoards
                     if (point == endPoint)
                     {
                         pointsMap.AddLast(point);
-                        var temp = new PointBehaviour[pointsMap.Count];
+                        PointBehaviour[] temp = new PointBehaviour[pointsMap.Count];
                         pointsMap.CopyTo(temp, 0);
                         _possiblePaths.Add(temp);
                         break;
@@ -193,9 +194,10 @@ namespace CupBoards
 
         private void MoveCup()
         {
-            float interpolationRatio = _elapsedFrames / _interpolationFramesCount;
+            float interpolationFramesCount = _cupMovementTime / Time.deltaTime;
+            float interpolationRatio = _elapsedFrames / interpolationFramesCount;
             _currentCup.transform.position = Vector3.Lerp(_startPointDirection, _endPointDirection, interpolationRatio);
-            _elapsedFrames = (_elapsedFrames + 1) % (_interpolationFramesCount + 1);
+            _elapsedFrames = (_elapsedFrames + 1) % (interpolationFramesCount + 1);
 
             if (_currentCup.transform.position == _endPointDirection)
             {
@@ -205,7 +207,7 @@ namespace CupBoards
 
         private void StopMoving()
         {
-            _elapsedFrames = 0f;            
+            _elapsedFrames = 0f;
             if (_pathIndex < _shortestPath.Length - 1)
             {
                 _pathIndex++;
