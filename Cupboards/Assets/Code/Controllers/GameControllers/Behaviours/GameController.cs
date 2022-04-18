@@ -30,19 +30,16 @@ namespace CupBoards
         private void Update()
         {
             _activeController.Execute(UpdateType.Update);
-            _activeController.Cleanup(UpdateType.Update);
         }
 
         private void FixedUpdate()
         {
             _activeController.Execute(UpdateType.Fixed);
-            _activeController.Cleanup(UpdateType.Fixed);
         }
 
         private void LateUpdate()
         {
             _activeController.Execute(UpdateType.Late);
-            _activeController.Cleanup(UpdateType.Update);
         }
 
         private void OnDestroy()
@@ -59,7 +56,6 @@ namespace CupBoards
                 return;
             }
             _activeController.Execute(UpdateType.Gizmos);
-            _activeController.Cleanup(UpdateType.Gizmos);
         }
 
 #endif

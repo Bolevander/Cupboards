@@ -7,8 +7,6 @@
         public GameSystemsController(GameContext context)
         {
             AddUpdateFeature(new MainControllers(context));
-            AddFixedUpdateFeature(new MainFixedControllers(context));
-            AddLateUpdateFeature(new MainLateControllers(context));
         }
 
         #endregion

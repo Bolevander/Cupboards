@@ -62,17 +62,17 @@ namespace CupBoards
 
         #region Methods
 
-        public void CreateLevel()
+        private void CreateLevel()
         {
             InstantiateLines(_context.CurrentLevel);
             InstantiatePoints(_context.CurrentLevel);
             InstantiateCups(_context.CurrentLevel);
-            SetAvailablePoints(_context.CurrentLevel);
+            SetAvailableTransitioins(_context.CurrentLevel);
             _context.LoadMenu.OnStart.Invoke();
         }
 
         private void InstantiateLoadButtons(GameObject parent)
-        {           
+        {
             for (int i = 0; i < _context.Levels.Count; i++)
             {
                 var button = Object.Instantiate(_loadButton, parent.transform);
@@ -86,12 +86,20 @@ namespace CupBoards
 
         private void InstantiateLines(LevelData level)
         {
-            for (int i = 0; i < level.linksBetweenPoints.Length; i++)
+            var rows = level.AdjacencyMatrix.GetUpperBound(0) + 1;
+            var columns = level.AdjacencyMatrix.Length / rows;
+
+            for (int i = 1; i < rows; i++)
             {
-                var lineInstance = InstantiateObject(_pathLine, level.pointsCoordinates[level.linksBetweenPoints[i].
-                    Item1 - 1]);
-                lineInstance.rotation = GetLineRotation(level, i);
-                lineInstance.sizeDelta = new Vector2(GetLineWidth(level, i), LINE_HEIGHT);
+                for (int j = 1; j < columns; j++)
+                {
+                    if (level.AdjacencyMatrix[i, j] == 1)
+                    {
+                        var lineInstance = InstantiateObject(_pathLine, level.pointsCoordinates[i - 1]);
+                        lineInstance.rotation = GetLineRotation(level, i - 1, j - 1);
+                        lineInstance.sizeDelta = new Vector2(GetLineWidth(level, i - 1, j - 1), LINE_HEIGHT);
+                    }
+                }
             }
         }
 
@@ -99,7 +107,8 @@ namespace CupBoards
         {
             for (int i = 0; i < level.pointsCoordinates.Length; i++)
             {
-                _context.Points.Add(InstantiateObject(_point, level.pointsCoordinates[i]));
+                var pointInstance = InstantiateObject(_point, level.pointsCoordinates[i]);
+                _context.Points.Add(pointInstance);
             }
         }
 
@@ -109,6 +118,22 @@ namespace CupBoards
             {
                 var cupInstance = InstantiateObject(_cup, level.pointsCoordinates[level.startCupPoints[i] - 1]);
                 _context.Points[level.startCupPoints[i] - 1].placedCup = cupInstance;
+            }
+        }
+
+        private void SetAvailableTransitioins(LevelData level)
+        {
+            var length = level.AdjacencyMatrix.GetUpperBound(1) + 1;
+            for (int i = 0; i < _context.Points.Count; i++)
+            {
+                for (int j = 1; j < length; j++)
+                {
+                    if (level.AdjacencyMatrix[i + 1, j] == 1)
+                    {
+                        _context.Points[i].AvailableTransitions.Add(_context.Points[j - 1]);
+                        _context.Points[j - 1].AvailableTransitions.Add(_context.Points[i]);
+                    }
+                }
             }
         }
 
@@ -124,29 +149,18 @@ namespace CupBoards
             return instance;
         }
 
-        private void SetAvailablePoints(LevelData level)
+        private Quaternion GetLineRotation(LevelData level, int index1, int index2)
         {
-            foreach (var link in level.linksBetweenPoints)
-            {
-                _context.Points[link.Item1 - 1].AvailableTransitions.Add(_context.Points[link.Item2 - 1]);
-                _context.Points[link.Item2 - 1].AvailableTransitions.Add(_context.Points[link.Item1 - 1]);
-            }
-        }
-
-        private Quaternion GetLineRotation(LevelData level, int index)
-        {
-            var dirrection = level.pointsCoordinates[level.linksBetweenPoints[index].Item1 - 1] -
-                    level.pointsCoordinates[level.linksBetweenPoints[index].Item2 - 1];
+            var dirrection = level.pointsCoordinates[index1] - level.pointsCoordinates[index2];
             var angle = Vector3.Angle(Vector3.left, dirrection);
             var axis = Vector3.Cross(Vector3.left, dirrection);
 
             return Quaternion.AngleAxis(angle, axis);
         }
 
-        private float GetLineWidth(LevelData level, int index)
+        private float GetLineWidth(LevelData level, int index1, int index2)
         {
-            return (level.pointsCoordinates[level.linksBetweenPoints[index].Item2 - 1]
-                    - level.pointsCoordinates[level.linksBetweenPoints[index].Item1 - 1]).magnitude;
+            return (level.pointsCoordinates[index2] - level.pointsCoordinates[index1]).magnitude;
         }
     }
 

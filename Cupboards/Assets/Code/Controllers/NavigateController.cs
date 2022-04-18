@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CupBoards
 {
-    public sealed class NavigateController : IExecuteController, IInitializeController
+    public sealed class NavigateController : IExecuteController, IInitializeController, ITearDownController
     {
         #region Fields
 
@@ -52,6 +52,16 @@ namespace CupBoards
             {
                 MoveCup();
             }
+        }
+
+        #endregion
+
+
+        #region ICleanupController
+
+        public void TearDown()
+        {
+            _context.LoadMenu.OnStart -= SetOnClickEvent;
         }
 
         #endregion
@@ -130,6 +140,11 @@ namespace CupBoards
         private void CreatePaths(PointBehaviour currentPoint, PointBehaviour endPoint = null,
             LinkedList<PointBehaviour> pointsMap = null)
         {
+            if (currentPoint == null)
+            {
+                return;
+            }
+
             if (pointsMap == null)
             {
                 pointsMap = new LinkedList<PointBehaviour>();
