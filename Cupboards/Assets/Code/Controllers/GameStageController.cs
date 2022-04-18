@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 namespace CupBoards
 {
-    public class GameStageController : IInitializeController
+    public class GameStageController : IInitializeController, ITearDownController
     {
         #region Fields
 
         private readonly GameContext _context;
         private List<int> _cupIds;
         private FinishScreenBehaviour _finishScreen;
+        private LevelContainerBehaviour _levelContainer;
 
         #endregion
 
@@ -31,7 +33,23 @@ namespace CupBoards
         {
             _cupIds = new List<int>();
             _finishScreen = Object.FindObjectOfType<FinishScreenBehaviour>(true);
+            _levelContainer = Object.FindObjectOfType<LevelContainerBehaviour>();
+            _finishScreen.restartButton.onClick.AddListener(Restart);
+            _levelContainer.restartButton.onClick.AddListener(Restart);
+
             _context.LoadMenu.OnStart += SetIds;
+            _context.LoadMenu.OnStart += TurnOnRestartButton;
+        }
+
+        #endregion
+
+
+        #region ICleanupController
+
+        public void TearDown()
+        {
+            _context.LoadMenu.OnStart -= SetIds;
+            _context.LoadMenu.OnStart -= TurnOnRestartButton;
         }
 
         #endregion
@@ -61,10 +79,20 @@ namespace CupBoards
             Finish();
         }
 
+        private void TurnOnRestartButton()
+        {
+            _levelContainer.restartButton.gameObject.SetActive(true);
+        }
+
         private void Finish()
         {
             _finishScreen.gameObject.SetActive(true);
-        } 
+        }
+
+        private void Restart()
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
 
         #endregion
     }

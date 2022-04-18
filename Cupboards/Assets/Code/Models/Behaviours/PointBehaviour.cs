@@ -54,6 +54,11 @@ namespace CupBoards
             AvailableTransitions = new List<PointBehaviour>();
         }
 
+        private void OnDestroy()
+        {
+            OnPointerClickEvent = null;
+        }
+
         protected virtual void OnValidate()
         {
             if (_image == null)

@@ -3,13 +3,12 @@
 
 namespace CupBoards
 {
-    public abstract class Controllers : IInitializeController, IExecuteController, ICleanupController, ITearDownController
+    public abstract class Controllers : IInitializeController, IExecuteController, ITearDownController
     {
         #region Fields
 
         protected readonly List<IInitializeController> _initializeControllers;
         protected readonly List<IExecuteController> _executeControllers;
-        protected readonly List<ICleanupController> _cleanupControllers;
         protected readonly List<ITearDownController> _tearDownControllers;
 
         #endregion
@@ -21,7 +20,6 @@ namespace CupBoards
         {
             _initializeControllers = new List<IInitializeController>();
             _executeControllers = new List<IExecuteController>();
-            _cleanupControllers = new List<ICleanupController>();
             _tearDownControllers = new List<ITearDownController>();
         }
 
@@ -32,11 +30,6 @@ namespace CupBoards
 
         protected virtual Controllers Add(IController controller)
         {
-            if (controller is ICleanupController cleanupController)
-            {
-                _cleanupControllers.Add(cleanupController);
-            }
-
             if (controller is IExecuteController executeController)
             {
                 _executeControllers.Add(executeController);
@@ -78,19 +71,6 @@ namespace CupBoards
             for (var index = 0; index < _executeControllers.Count; ++index)
             {
                 _executeControllers[index].Execute();
-            }
-        }
-
-        #endregion
-
-
-        #region ICleanupController
-
-        public virtual void Cleanup()
-        {
-            for (var index = 0; index < _cleanupControllers.Count; ++index)
-            {
-                _cleanupControllers[index].Cleanup();
             }
         }
 
