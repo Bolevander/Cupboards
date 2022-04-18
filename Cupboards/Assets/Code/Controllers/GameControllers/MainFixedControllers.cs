@@ -6,7 +6,7 @@
 
         public MainFixedControllers(GameContext context)
         {
-            Add(new NavigateController(context));
+            
         }
 
         #endregion

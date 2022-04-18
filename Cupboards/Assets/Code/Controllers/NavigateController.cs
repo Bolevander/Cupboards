@@ -10,8 +10,8 @@ namespace CupBoards
 
         private readonly GameContext _context;
 
-        private float _cupMovementTime;
         private bool _isMoving;
+        private float _interpolationFramesCount;
         private float _elapsedFrames;
         private Vector3 _endPointDirection;
         private Vector3 _startPointDirection;
@@ -38,8 +38,7 @@ namespace CupBoards
 
         public void Initialize()
         {
-            _context.LoadMenu.OnStart += SetOnClickEvent;
-            _cupMovementTime = 1 / _context.CupSpeed;
+            _context.LoadMenu.OnStart += SetOnClickEvent;            
         }
 
         #endregion
@@ -188,16 +187,16 @@ namespace CupBoards
                 point.placedCup = _currentCup;
                 _startPointDirection = _currentCup.transform.position;
                 _endPointDirection = point.transform.position;
+                _interpolationFramesCount = 1 / (_context.CupSpeed * Time.deltaTime);
                 _isMoving = true;
             }
         }
 
         private void MoveCup()
         {
-            float interpolationFramesCount = _cupMovementTime / Time.deltaTime;
-            float interpolationRatio = _elapsedFrames / interpolationFramesCount;
+            float interpolationRatio = _elapsedFrames / _interpolationFramesCount;
             _currentCup.transform.position = Vector3.Lerp(_startPointDirection, _endPointDirection, interpolationRatio);
-            _elapsedFrames = (_elapsedFrames + 1) % (interpolationFramesCount + 1);
+            _elapsedFrames = (_elapsedFrames + 1) % (_interpolationFramesCount + 1);
 
             if (_currentCup.transform.position == _endPointDirection)
             {

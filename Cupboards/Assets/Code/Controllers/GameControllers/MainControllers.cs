@@ -8,6 +8,7 @@
         {
             Add(new LevelController(context));
             Add(new GameStageController(context));
+            Add(new NavigateController(context));
         }
 
         #endregion
